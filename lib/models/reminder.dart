@@ -27,9 +27,9 @@ class Reminder {
 
   DateTime getFirstDateTime() {
     String whole = firstDate + " " + time;
-    print(whole);
-    DateTime dt = DateFormat("EEEE dd.MM.yyyy HH:MM").parse(whole);
-    print(dt.toString());
+    DateTime dt =
+        DateFormat("EEEE dd.MM.yyyy HH:mm").parse("Monday 01.12.2019 17:00");
+
     return dt;
   }
 }

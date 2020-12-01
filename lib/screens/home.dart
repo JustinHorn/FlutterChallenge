@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
                   i,
                   "Example Message",
                   Cycle.once,
-                  "Monday 01.12.2020",
+                  "Monday 01.12.2019",
                   "17:00",
                 ),
               ),

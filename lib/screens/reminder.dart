@@ -2,6 +2,7 @@ import 'package:ReminderApp/models/reminder.dart';
 import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:ReminderApp/cycle.dart';
+import 'dart:math';
 
 class ReminderPage extends StatefulWidget {
   ReminderPage({
@@ -22,6 +23,9 @@ class _ReminderPageState extends State<ReminderPage> {
   DateTime time;
   Cycle _cycle;
 
+  DateTime minimumTime;
+  DateTime maximumTime;
+
   @override
   void initState() {
     super.initState();
@@ -29,10 +33,19 @@ class _ReminderPageState extends State<ReminderPage> {
     _cycle = Cycle.once;
     _message = "";
     time = DateTime.now();
+    minimumTime = time;
+    maximumTime = DateTime(2100);
 
     if (widget.reminder != null) {
       _message = widget.reminder.message;
       time = widget.reminder.getFirstDateTime();
+      if (time.millisecondsSinceEpoch < minimumTime.millisecondsSinceEpoch) {
+        minimumTime = DateTime.fromMillisecondsSinceEpoch(
+            time.millisecondsSinceEpoch - 1);
+        maximumTime = DateTime.fromMillisecondsSinceEpoch(
+            time.millisecondsSinceEpoch + 1);
+      }
+      print(minimumTime.toString());
       _cycle = widget.reminder.cycle;
     }
   }
@@ -58,6 +71,7 @@ class _ReminderPageState extends State<ReminderPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 TextField(
+                  controller: TextEditingController(text: _message),
                   decoration: InputDecoration(labelText: "Message"),
                   onChanged: (value) => _message = value,
                 ),
@@ -71,18 +85,15 @@ class _ReminderPageState extends State<ReminderPage> {
                         type: DateTimePickerType.dateTimeSeparate,
                         dateMask: 'EEEE d MMM, yyyy',
                         initialValue: time.toString(),
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime(2100),
+                        firstDate: minimumTime,
+                        lastDate: maximumTime,
                         icon: Icon(Icons.event),
                         dateLabelText: 'Date',
                         timeLabelText: "Hour",
-                        selectableDayPredicate: (date) {
-                          if (date.weekday == 6 || date.weekday == 7) {
-                            return false;
-                          }
-                          return true;
+                        onChanged: (val) {
+                          time = DateTime.parse(val);
+                          print(time.toString());
                         },
-                        onChanged: (val) => time = DateTime.parse(val),
                       ),
                       ButtonBar(
                           alignment: MainAxisAlignment.center,
@@ -114,7 +125,8 @@ class _ReminderPageState extends State<ReminderPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           logData();
-          Navigator.pop(context);
+          widget.reminder.getFirstDateTime();
+          //Navigator.pop(context);
         },
         tooltip: 'Create Reminder',
         child: Icon(Icons.check),
