@@ -31,7 +31,7 @@ extension CycleExtension on Cycle {
     }
   }
 
-  Cycle getById(int id) {
+  static Cycle getById(int id) {
     return Cycle.values.where((element) => element.id == id).first;
   }
 }

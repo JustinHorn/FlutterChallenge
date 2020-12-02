@@ -1,9 +1,11 @@
+import 'package:ReminderApp/database_helper.dart';
 import 'package:ReminderApp/models/reminder.dart';
 import 'package:ReminderApp/screens/reminder.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ReminderApp/cycle.dart';
+import 'package:sqflite/sqflite.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -14,6 +16,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  DatabaseHelper databaseHelper = new DatabaseHelper();
+
+  int id = 1;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,57 +32,65 @@ class _HomePageState extends State<HomePage> {
           horizontal: 24.0,
           vertical: 0,
         ),
-        child: ListView(
-          children: [
-            ...List<Widget>.generate(
-              10,
-              (i) => ReminderHomeEntry(
-                Reminder(
-                  i,
-                  "Example Message",
-                  Cycle.once,
-                  "Monday 01.12.2019",
-                  "17:00",
-                ),
-              ),
-            )
-          ],
+        child: FutureBuilder(
+          initialData: [],
+          future: databaseHelper.getReminders(),
+          builder: (context, snapshot) {
+            return ListView.builder(
+              itemCount: snapshot.data.length,
+              itemBuilder: (context, index) {
+                if (index + 1 == snapshot.data.length) {
+                  id = snapshot.data[index].id + 1;
+                }
+                return ReminderHomeEntry(snapshot.data[index], getOnTap());
+              },
+            );
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ReminderPage(),
+            builder: (context) => ReminderPage(id: id),
           ),
-        ),
+        ).then((value) {
+          setState(() {});
+        }),
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),
     );
   }
+
+  Function getOnTap() {
+    return (reminder) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ReminderPage(
+            title: "Edit Reminder",
+            reminder: reminder,
+          ),
+        ),
+      ).then((v) {
+        setState(() {});
+        print("setState executed!");
+      });
+    };
+  }
 }
 
 class ReminderHomeEntry extends StatelessWidget {
   Reminder reminder;
+  Function onTap;
 
-  ReminderHomeEntry(this.reminder);
+  ReminderHomeEntry(this.reminder, this.onTap);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        print("hi");
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ReminderPage(
-              title: "Edit Reminder",
-              reminder: reminder,
-            ),
-          ),
-        );
-      },
+      onTap: () => onTap(reminder),
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: 10,
@@ -107,7 +121,21 @@ class ReminderHomeEntry extends StatelessWidget {
                     style: Theme.of(context).primaryTextTheme.bodyText1,
                   ),
                 )
-                .toList()
+                .toList(),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'First: ${reminder.firstDate}',
+                    style: Theme.of(context).primaryTextTheme.bodyText1,
+                  ),
+                ),
+                Text(
+                  reminder.id.toString(),
+                  style: Theme.of(context).primaryTextTheme.bodyText1,
+                )
+              ],
+            )
           ],
         ),
       ),
@@ -119,8 +147,6 @@ class ReminderHomeEntry extends StatelessWidget {
       "Cycle: " + reminder.cycle.name,
       "Time: " + reminder.time,
       "Next: " + reminder.calcNextDate(),
-      "First: " + reminder.firstDate,
-      "ID: " + reminder.id.toString()
     ];
   }
 }

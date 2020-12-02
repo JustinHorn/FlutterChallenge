@@ -5,14 +5,15 @@ import 'package:path/path.dart';
 
 import 'cycle.dart';
 import 'models/reminder.dart';
+import 'package:intl/intl.dart';
 
 class DatabaseHelper {
   Future<Database> database() async {
     return openDatabase(
-      join(await getDatabasesPath(), "reminders.db"),
+      join(await getDatabasesPath(), "reminder.db"),
       onCreate: (db, version) {
         db.execute(
-          "CREATE TABLE reminders(id INTEGER PRIMARY KEY, message TEXT, cycle INTEGER, firstDate VARCHAR(20), time VARCHAR(10))",
+          "CREATE TABLE reminder(id INTEGER PRIMARY KEY, message TEXT, cycle INTEGER, firstDate VARCHAR(20), time VARCHAR(10))",
         );
 
         return db;
@@ -34,14 +35,14 @@ class DatabaseHelper {
 
   Future<List<Reminder>> getReminders() async {
     Database _db = await database();
-    List<Map<String, dynamic>> reminderMap = await _db.query("tasks");
+    List<Map<String, dynamic>> reminderMap = await _db.query("reminder");
     return List.generate(
       reminderMap.length,
       (index) {
         return Reminder(
           reminderMap[index]["id"],
           reminderMap[index]["message"],
-          Cycle.getById(reminderMap[index]["cycle"]),
+          CycleExtension.getById(reminderMap[index]["cycle"]),
           reminderMap[index]["firstDate"],
           reminderMap[index]["time"],
         );

@@ -1,24 +1,30 @@
+import 'package:ReminderApp/database_helper.dart';
 import 'package:ReminderApp/models/reminder.dart';
 import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:ReminderApp/cycle.dart';
 import 'dart:math';
+import 'package:intl/intl.dart';
 
 class ReminderPage extends StatefulWidget {
   ReminderPage({
     Key key,
     this.title = "Create Reminder",
-    this.reminder = null,
+    this.reminder,
+    this.id,
   }) : super(key: key);
 
   final String title;
   final Reminder reminder;
+  final int id;
 
   @override
   _ReminderPageState createState() => _ReminderPageState();
 }
 
 class _ReminderPageState extends State<ReminderPage> {
+  DatabaseHelper databaseHelper = DatabaseHelper();
+
   String _message;
   DateTime time;
   Cycle _cycle;
@@ -29,6 +35,10 @@ class _ReminderPageState extends State<ReminderPage> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.reminder == null && widget.id == null) {
+      throw new Exception("Either widget or id needs to be defined!");
+    }
 
     _cycle = Cycle.once;
     _message = "";
@@ -45,15 +55,24 @@ class _ReminderPageState extends State<ReminderPage> {
         maximumTime = DateTime.fromMillisecondsSinceEpoch(
             time.millisecondsSinceEpoch + 1);
       }
-      print(minimumTime.toString());
       _cycle = widget.reminder.cycle;
     }
   }
 
+  String getDate() {
+    return DateFormat("EEEE dd.MM.yyyy").format(time);
+  }
+
+  String getTime() {
+    return DateFormat("HH:mm").format(time);
+  }
+
   void logData() {
     print(_message);
-    print(time);
+    print(getDate());
+    print(getTime());
     print(_cycle.name);
+    print(widget.id);
   }
 
   @override
@@ -122,15 +141,54 @@ class _ReminderPageState extends State<ReminderPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          logData();
-          widget.reminder.getFirstDateTime();
-          //Navigator.pop(context);
-        },
-        tooltip: 'Create Reminder',
-        child: Icon(Icons.check),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            if (widget.reminder != null)
+              FloatingActionButton(
+                onPressed: () async {
+                  await databaseHelper.deleteReminder(getId());
+                  print("Reminder was deleted!");
+                  Navigator.pop(context);
+                },
+                child: Icon(Icons.delete),
+                heroTag: "btn1",
+              )
+            else
+              Text(""),
+            FloatingActionButton(
+              onPressed: () async {
+                logData();
+                Reminder reminder = Reminder(
+                  getId(),
+                  _message,
+                  _cycle,
+                  getDate(),
+                  getTime(),
+                );
+
+                await databaseHelper.insertReminder(reminder);
+                print("reminder inserted or replaced!");
+                Navigator.pop(context);
+              },
+              tooltip: 'Create Reminder',
+              child: Icon(Icons.check),
+              heroTag: "btn2",
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  int getId() {
+    if (widget.reminder != null) {
+      return widget.reminder.id;
+    } else {
+      return widget.id;
+    }
   }
 }
