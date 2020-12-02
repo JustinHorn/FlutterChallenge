@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/reminder.dart';
+import 'screens/reminder/reminder.dart';
 import 'screens/home.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_file.dart';
