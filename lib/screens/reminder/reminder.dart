@@ -113,9 +113,7 @@ class _ReminderPageState extends State<ReminderPage> {
   }
 
   void setMessage(newMessage) {
-    setState(() {
-      _message = newMessage;
-    });
+    _message = newMessage;
   }
 
   void setTime(String val) {
