@@ -5,6 +5,7 @@ import 'package:date_time_picker/date_time_picker.dart';
 import 'package:ReminderApp/cycle.dart';
 import 'dart:math';
 import 'package:intl/intl.dart';
+import 'package:ReminderApp/main.dart';
 
 import 'action_buttons.dart';
 import 'cycle_selector.dart';
@@ -100,16 +101,15 @@ class _ReminderPageState extends State<ReminderPage> {
       getDate(),
       getTime(),
     );
+
+    ReminderAction rA = new ReminderAction(
+      reminderExists ? ReminderActionType.replace : ReminderActionType.add,
+      reminder: reminder,
+    );
+    context.read<ReminderBloc>().add(rA);
+
     await databaseHelper.insertReminder(reminder);
     print("Reminder inserted or replaced!");
-  }
-
-  void logData() {
-    print(_message);
-    print(getDate());
-    print(getTime());
-    print(_cycle.name);
-    print(widget.id);
   }
 
   void setMessage(newMessage) {

@@ -1,6 +1,9 @@
 import 'package:ReminderApp/database_helper.dart';
+import 'package:ReminderApp/models/reminder.dart';
 import 'package:ReminderApp/screens/reminder/reminder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ReminderApp/main.dart';
 
 import 'reminder_entry.dart';
 
@@ -18,6 +21,18 @@ class _HomePageState extends State<HomePage> {
   int id = 1;
 
   @override
+  void initState() {
+    super.initState();
+    databaseHelper.getReminders().then((reminders) {
+      ReminderAction rA = new ReminderAction(
+        ReminderActionType.addAll,
+        reminders: reminders,
+      );
+      context.read<ReminderBloc>().add(rA);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -29,18 +44,16 @@ class _HomePageState extends State<HomePage> {
           horizontal: 24.0,
           vertical: 0,
         ),
-        child: FutureBuilder(
-          initialData: [],
-          future: databaseHelper.getReminders(),
-          builder: (context, snapshot) {
+        child: BlocBuilder<ReminderBloc, List<Reminder>>(
+          builder: (_, reminder) {
             return ListView.builder(
-              itemCount: snapshot.data.length,
+              itemCount: reminder.length,
               itemBuilder: (context, index) {
-                if (index + 1 == snapshot.data.length) {
-                  id = snapshot.data[index].id + 1;
+                if (index + 1 == reminder.length) {
+                  id = reminder[index].id + 1;
                 }
                 return ReminderHomeEntry(
-                  snapshot.data[index],
+                  reminder[index],
                   goToReminderPage,
                 );
               },
@@ -49,14 +62,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(
-          context,
+        onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => ReminderPage(id: id),
           ),
-        ).then((value) {
-          setState(() {});
-        }),
+        ),
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),
