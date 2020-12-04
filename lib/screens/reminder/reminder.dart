@@ -1,11 +1,10 @@
-import 'package:ReminderApp/database_helper.dart';
 import 'package:ReminderApp/models/reminder.dart';
+import 'package:ReminderApp/reminder_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:ReminderApp/cycle.dart';
-import 'dart:math';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:ReminderApp/main.dart';
 
 import 'action_buttons.dart';
 import 'cycle_selector.dart';
@@ -29,8 +28,6 @@ class ReminderPage extends StatefulWidget {
 }
 
 class _ReminderPageState extends State<ReminderPage> {
-  DatabaseHelper databaseHelper = DatabaseHelper();
-
   String _message;
   DateTime time;
   Cycle _cycle;
@@ -50,11 +47,11 @@ class _ReminderPageState extends State<ReminderPage> {
       throw new Exception("Either widget or id needs to be defined!");
     }
 
-    _cycle = Cycle.once;
     _message = "";
     time = DateTime.now();
     minimumTime = time;
     maximumTime = DateTime(2100);
+    _cycle = Cycle.daily;
 
     reminderExists = widget.reminder != null;
 
@@ -88,7 +85,13 @@ class _ReminderPageState extends State<ReminderPage> {
   }
 
   Future<void> deleteReminder() async {
-    await databaseHelper.deleteReminder(getId());
+    ReminderBloc _reminderBloc = BlocProvider.of<ReminderBloc>(context);
+
+    ReminderAction rA = new ReminderAction(
+      ReminderActionType.delete,
+      reminder: widget.reminder,
+    );
+    _reminderBloc.add(rA);
 
     print("Reminder was deleted!");
   }
@@ -102,13 +105,14 @@ class _ReminderPageState extends State<ReminderPage> {
       getTime(),
     );
 
+    ReminderBloc _reminderBloc = BlocProvider.of<ReminderBloc>(context);
+
     ReminderAction rA = new ReminderAction(
       reminderExists ? ReminderActionType.replace : ReminderActionType.add,
       reminder: reminder,
     );
-    context.read<ReminderBloc>().add(rA);
+    _reminderBloc.add(rA);
 
-    await databaseHelper.insertReminder(reminder);
     print("Reminder inserted or replaced!");
   }
 

@@ -39,6 +39,7 @@ class DatabaseHelper {
     return List.generate(
       reminderMap.length,
       (index) {
+        print(reminderMap[index]);
         return Reminder(
           reminderMap[index]["id"],
           reminderMap[index]["message"],

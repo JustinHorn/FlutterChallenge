@@ -1,5 +1,6 @@
 import 'package:ReminderApp/database_helper.dart';
 import 'package:ReminderApp/models/reminder.dart';
+import 'package:ReminderApp/reminder_bloc.dart';
 import 'package:ReminderApp/screens/reminder/reminder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -74,15 +75,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   void goToReminderPage(reminder) {
-    Navigator.push(
-      context,
+    Navigator.of(context)
+        .push(
       MaterialPageRoute(
         builder: (context) => ReminderPage(
           title: "Edit Reminder",
           reminder: reminder,
         ),
       ),
-    ).then((v) {
+    )
+        .then((v) {
       setState(() {});
     });
   }

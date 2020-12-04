@@ -32,6 +32,7 @@ extension CycleExtension on Cycle {
   }
 
   static Cycle getById(int id) {
+    print("cycle");
     return Cycle.values.where((element) => element.id == id).first;
   }
 }
