@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 
 import 'action_buttons.dart';
 import 'cycle_selector.dart';
-import 'message_field.dart';
+import 'title_field.dart';
 import 'time_selector.dart';
 
 class ReminderPage extends StatefulWidget {
@@ -32,25 +32,26 @@ class _ReminderPageState extends State<ReminderPage> {
   DateTime time;
   Cycle _cycle;
 
-  DateTime minimumTime;
-  DateTime maximumTime;
+  String dayTime = "05:30";
+  String firstDate = " 2020-12-04 11:48:11.814341";
 
   bool reminderExists;
 
-  String dateMask = 'EEEE d MMM, yyyy';
+  String dateMask = 'EEEE dd.MM.yyyy';
+
+  ReminderBloc _reminderBloc;
 
   @override
   void initState() {
     super.initState();
-
+    _reminderBloc = BlocProvider.of<ReminderBloc>(context);
     if (widget.reminder == null && widget.id == null) {
       throw new Exception("Either widget or id needs to be defined!");
     }
 
     _message = "";
     time = DateTime.now();
-    minimumTime = time;
-    maximumTime = DateTime(2100);
+
     _cycle = Cycle.daily;
 
     reminderExists = widget.reminder != null;
@@ -58,22 +59,72 @@ class _ReminderPageState extends State<ReminderPage> {
     if (reminderExists) {
       _message = widget.reminder.message;
       time = widget.reminder.getFirstDateTime();
-      if (time.millisecondsSinceEpoch < minimumTime.millisecondsSinceEpoch) {
-        minimumTime = DateTime.fromMillisecondsSinceEpoch(
-            time.millisecondsSinceEpoch - 1);
-        maximumTime = DateTime.fromMillisecondsSinceEpoch(
-            time.millisecondsSinceEpoch + 1);
-      }
+
       _cycle = widget.reminder.cycle;
     }
+
+    dayTime = DateFormat("HH:mm").format(time);
+    firstDate = DateFormat(dateMask).format(time);
   }
 
-  String getDate() {
-    return DateFormat("EEEE dd.MM.yyyy").format(time);
+  void setDayTime(value) {
+    dayTime = value;
   }
 
-  String getTime() {
-    return DateFormat("HH:mm").format(time);
+  void setFirstDate(value) {
+    firstDate = value;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Center(
+          child: Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                TitleField(_message, setMessage),
+                DateTimePicker(
+                  type: DateTimePickerType.date,
+                  dateMask: dateMask,
+                  initialValue: time.toString(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                  icon: Icon(Icons.event),
+                  dateLabelText: 'First Day',
+                  timeLabelText: "Hour",
+                  onChanged: setFirstDate,
+                ),
+                DateTimePicker(
+                  type: DateTimePickerType.time,
+                  dateMask: dateMask,
+                  initialValue: dayTime,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                  icon: Icon(Icons.access_alarm),
+                  dateLabelText: 'Date',
+                  timeLabelText: "Time of Day",
+                  onChanged: setDayTime,
+                ),
+                CycleSelector(_cycle, setCycle)
+              ],
+            ),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: ActionButtons(
+        reminderExists,
+        insertOrReplaceReminder,
+        deleteReminder,
+      ),
+    );
   }
 
   int getId() {
@@ -85,8 +136,6 @@ class _ReminderPageState extends State<ReminderPage> {
   }
 
   Future<void> deleteReminder() async {
-    ReminderBloc _reminderBloc = BlocProvider.of<ReminderBloc>(context);
-
     ReminderAction rA = new ReminderAction(
       ReminderActionType.delete,
       reminder: widget.reminder,
@@ -101,11 +150,9 @@ class _ReminderPageState extends State<ReminderPage> {
       getId(),
       _message,
       _cycle,
-      getDate(),
-      getTime(),
+      firstDate,
+      dayTime,
     );
-
-    ReminderBloc _reminderBloc = BlocProvider.of<ReminderBloc>(context);
 
     ReminderAction rA = new ReminderAction(
       reminderExists ? ReminderActionType.replace : ReminderActionType.add,
@@ -130,42 +177,5 @@ class _ReminderPageState extends State<ReminderPage> {
     setState(() {
       _cycle = newCycle;
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Center(
-          child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                MessageField(_message, setMessage),
-                TimeSelector(
-                  dateMask,
-                  setTime,
-                  time,
-                  minimumTime,
-                  maximumTime,
-                ),
-                CycleSelector(_cycle, setCycle)
-              ],
-            ),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: ActionButtons(
-        reminderExists,
-        insertOrReplaceReminder,
-        deleteReminder,
-      ),
-    );
   }
 }

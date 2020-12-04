@@ -75,17 +75,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   void goToReminderPage(reminder) {
-    Navigator.of(context)
-        .push(
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ReminderPage(
           title: "Edit Reminder",
           reminder: reminder,
         ),
       ),
-    )
-        .then((v) {
-      setState(() {});
-    });
+    );
   }
 }

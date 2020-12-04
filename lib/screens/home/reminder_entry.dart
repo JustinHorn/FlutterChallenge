@@ -66,7 +66,7 @@ class ReminderHomeEntry extends StatelessWidget {
   List<String> getReminderDataAsList() {
     return [
       "Cycle: " + reminder.cycle.name,
-      "Time: " + reminder.time,
+      "Time: " + reminder.dayTime,
       "Next: " + reminder.calcNextDate(),
     ];
   }

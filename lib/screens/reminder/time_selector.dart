@@ -5,17 +5,18 @@ import 'package:date_time_picker/date_time_picker.dart';
 class TimeSelector extends StatelessWidget {
   String dateMask;
 
-  Function setTime;
-  DateTime time;
-  DateTime minimumTime;
-  DateTime maximumTime;
+  String dayTime;
+  String firstDate;
+
+  Function setDayTime;
+  Function setFirstDate;
 
   TimeSelector(
     this.dateMask,
-    this.setTime,
-    this.time,
-    this.minimumTime,
-    this.maximumTime,
+    this.dayTime,
+    this.firstDate,
+    this.setDayTime,
+    this.setFirstDate,
   );
 
   @override
@@ -26,23 +27,19 @@ class TimeSelector extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("Start Time:"),
-          getDateTimePicker(),
+          DateTimePicker(
+            type: DateTimePickerType.dateTimeSeparate,
+            dateMask: dateMask,
+            initialValue: firstDate + " " + dayTime,
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2100),
+            icon: Icon(Icons.event),
+            dateLabelText: 'Date',
+            timeLabelText: "Hour",
+            onChanged: setDayTime,
+          )
         ],
       ),
-    );
-  }
-
-  Widget getDateTimePicker() {
-    return DateTimePicker(
-      type: DateTimePickerType.dateTimeSeparate,
-      dateMask: dateMask,
-      initialValue: time.toString(),
-      firstDate: minimumTime,
-      lastDate: maximumTime,
-      icon: Icon(Icons.event),
-      dateLabelText: 'Date',
-      timeLabelText: "Hour",
-      onChanged: setTime,
     );
   }
 }

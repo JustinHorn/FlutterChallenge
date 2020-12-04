@@ -13,7 +13,7 @@ class DatabaseHelper {
       join(await getDatabasesPath(), "reminder.db"),
       onCreate: (db, version) {
         db.execute(
-          "CREATE TABLE reminder(id INTEGER PRIMARY KEY, message TEXT, cycle INTEGER, firstDate VARCHAR(20), time VARCHAR(10))",
+          "CREATE TABLE reminder(id INTEGER PRIMARY KEY, message TEXT, cycle INTEGER, firstDate VARCHAR(25), dayTime VARCHAR(10))",
         );
 
         return db;
@@ -45,7 +45,7 @@ class DatabaseHelper {
           reminderMap[index]["message"],
           CycleExtension.getById(reminderMap[index]["cycle"]),
           reminderMap[index]["firstDate"],
-          reminderMap[index]["time"],
+          reminderMap[index]["dayTime"],
         );
       },
     );

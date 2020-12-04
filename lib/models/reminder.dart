@@ -7,9 +7,9 @@ class Reminder {
   String message;
   Cycle cycle;
   String firstDate;
-  String time;
+  String dayTime;
 
-  Reminder(this.id, this.message, this.cycle, this.firstDate, this.time);
+  Reminder(this.id, this.message, this.cycle, this.firstDate, this.dayTime);
 
   String calcNextDate() {
     return firstDate;
@@ -21,12 +21,12 @@ class Reminder {
       "message": message,
       "cycle": cycle.id,
       "firstDate": firstDate,
-      "time": time,
+      "dayTime": dayTime,
     };
   }
 
   DateTime getFirstDateTime() {
-    String whole = firstDate + " " + time;
+    String whole = firstDate + " " + dayTime;
     DateTime dt = DateFormat("EEEE dd.MM.yyyy HH:mm").parse(whole);
 
     return dt;
