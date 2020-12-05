@@ -11,6 +11,8 @@ import 'cycle_selector.dart';
 import 'title_field.dart';
 import 'time_selector.dart';
 
+import 'package:ReminderApp/NotificationPlugin.dart';
+
 class ReminderPage extends StatefulWidget {
   ReminderPage({
     Key key,
@@ -44,6 +46,9 @@ class _ReminderPageState extends State<ReminderPage> {
   @override
   void initState() {
     super.initState();
+
+    notificationPluginLOL.setListenerForLowerVersions((a) {});
+    notificationPluginLOL.setOnNotificationClick((a) {});
     _reminderBloc = BlocProvider.of<ReminderBloc>(context);
     if (widget.reminder == null && widget.id == null) {
       throw new Exception("Either widget or id needs to be defined!");

@@ -1,3 +1,4 @@
+import 'package:ReminderApp/NotificationPlugin.dart';
 import 'package:ReminderApp/database_helper.dart';
 import 'package:ReminderApp/models/reminder.dart';
 import 'package:ReminderApp/reminder_bloc.dart';
@@ -23,14 +24,16 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    Function doNothing(value) {}
+
     super.initState();
-    databaseHelper.getReminders().then((reminders) {
-      ReminderAction rA = new ReminderAction(
-        ReminderActionType.addAll,
-        reminders: reminders,
-      );
-      context.read<ReminderBloc>().add(rA);
-    });
+    ReminderAction rA = new ReminderAction(
+      ReminderActionType.init,
+    );
+    context.read<ReminderBloc>().add(rA);
+
+    notificationPluginLOL.setListenerForLowerVersions((a) {});
+    notificationPluginLOL.setOnNotificationClick((a) {});
   }
 
   @override

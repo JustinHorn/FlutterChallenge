@@ -28,6 +28,11 @@ dependencies:
   path:
   intl: ^0.16.1
   flutter_bloc: ^6.1.1
+  rxdart: ^0.24.1
+  flutter_local_notifications: ^3.0.1+6
+  path_provider: ^1.6.24
+  timezone: ^0.5.9
+  http: ^0.12.2
 
 
 

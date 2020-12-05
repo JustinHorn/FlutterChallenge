@@ -1,9 +1,11 @@
+import 'package:ReminderApp/NotificationPlugin.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'database_helper.dart';
 import 'models/reminder.dart';
+import 'package:timezone/standalone.dart' as tz;
 
-enum ReminderActionType { add, replace, delete, addAll }
+enum ReminderActionType { init, add, replace, delete, addAll }
 
 class ReminderAction {
   ReminderActionType _type;
@@ -30,6 +32,9 @@ class ReminderBloc extends Bloc<ReminderAction, List<Reminder>> {
   Stream<List<Reminder>> mapEventToState(ReminderAction event) async* {
     List<Reminder> newList = List.from(state);
     switch (event.type) {
+      case ReminderActionType.init:
+        yield await databaseHelper.getReminders();
+        break;
       case ReminderActionType.addAll:
         newList.addAll(event.reminders);
         event.reminders.forEach((element) async {
@@ -40,7 +45,13 @@ class ReminderBloc extends Bloc<ReminderAction, List<Reminder>> {
       case ReminderActionType.add:
         newList.add(event.reminder);
         await databaseHelper.insertReminder(event.reminder);
+        Reminder reminder = event.reminder;
 
+        var berlin = tz.getLocation("Europe/Berlin");
+        tz.TZDateTime scheduleTime =
+            tz.TZDateTime.from(reminder.getFirstDateTime(), berlin);
+        notificationPluginLOL.scheduleNotification(
+            reminder.id, reminder.message, null, scheduleTime);
         yield newList;
         break;
       case ReminderActionType.replace:
@@ -56,7 +67,7 @@ class ReminderBloc extends Bloc<ReminderAction, List<Reminder>> {
             newList.indexWhere((element) => element.id == event.reminder.id);
         newList.removeAt(index);
         await databaseHelper.deleteReminder(event.reminder.id);
-
+        notificationPluginLOL.cancelNotification(event.reminder.id);
         yield newList;
         break;
       default:

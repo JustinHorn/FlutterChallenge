@@ -7,9 +7,14 @@ import 'screens/reminder/reminder.dart';
 import 'screens/home/home.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_file.dart';
+import 'package:timezone/timezone.dart' as tz;
+
+import 'package:timezone/data/latest.dart' as tz;
+import 'NotificationPlugin.dart';
 
 void main() {
   Bloc.observer = BlocObserver();
+  tz.initializeTimeZones();
 
   runApp(MyApp());
 }
