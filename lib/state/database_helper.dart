@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-import 'cycle.dart';
-import 'models/reminder.dart';
+import '../cycle.dart';
+import '../models/reminder.dart';
 import 'package:intl/intl.dart';
 
 class DatabaseHelper {

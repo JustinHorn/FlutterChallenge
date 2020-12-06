@@ -1,8 +1,8 @@
-import 'package:ReminderApp/NotificationPlugin.dart';
+import 'package:ReminderApp/Notificaitions/NotificationReminderLayer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'database_helper.dart';
-import 'models/reminder.dart';
+import '../models/reminder.dart';
 import 'package:timezone/standalone.dart' as tz;
 
 enum ReminderActionType { init, add, replace, delete, addAll }
@@ -45,33 +45,37 @@ class ReminderBloc extends Bloc<ReminderAction, List<Reminder>> {
       case ReminderActionType.add:
         newList.add(event.reminder);
         await databaseHelper.insertReminder(event.reminder);
-        Reminder reminder = event.reminder;
-
-        var berlin = tz.getLocation("Europe/Berlin");
-        tz.TZDateTime scheduleTime =
-            tz.TZDateTime.from(reminder.getFirstDateTime(), berlin);
-        notificationPluginLOL.scheduleNotification(
-            reminder.id, reminder.message, null, scheduleTime);
+        scheduleReminderNotification(event.reminder);
         yield newList;
         break;
       case ReminderActionType.replace:
-        int index =
-            newList.indexWhere((element) => element.id == event.reminder.id);
-        newList[index] = event.reminder;
+        replaceReminderInList(newList, event.reminder);
         await databaseHelper.insertReminder(event.reminder);
-
+        replaceReminderNotification(event.reminder);
         yield newList;
         break;
       case ReminderActionType.delete:
-        int index =
-            newList.indexWhere((element) => element.id == event.reminder.id);
-        newList.removeAt(index);
+        removeReminderFromList(newList, event.reminder);
         await databaseHelper.deleteReminder(event.reminder.id);
-        notificationPluginLOL.cancelNotification(event.reminder.id);
+        cancelReminderNotification(event.reminder);
         yield newList;
         break;
       default:
         addError(Exception('unsupported event'));
     }
+  }
+
+  void replaceReminderInList(List<Reminder> list, Reminder reminder) {
+    int index = getReminderIndexInList(list, reminder);
+    list[index] = reminder;
+  }
+
+  void removeReminderFromList(List<Reminder> list, Reminder reminder) {
+    int index = getReminderIndexInList(list, reminder);
+    list.removeAt(index);
+  }
+
+  int getReminderIndexInList(List<Reminder> list, Reminder reminder) {
+    return list.indexWhere((element) => element.id == reminder.id);
   }
 }

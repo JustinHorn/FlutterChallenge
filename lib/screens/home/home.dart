@@ -1,7 +1,6 @@
-import 'package:ReminderApp/NotificationPlugin.dart';
-import 'package:ReminderApp/database_helper.dart';
+import 'package:ReminderApp/Notificaitions/NotificationPlugin.dart';
 import 'package:ReminderApp/models/reminder.dart';
-import 'package:ReminderApp/reminder_bloc.dart';
+import 'package:ReminderApp/state/reminder_bloc.dart';
 import 'package:ReminderApp/screens/reminder/reminder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,8 +17,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  DatabaseHelper databaseHelper = new DatabaseHelper();
-
   int id = 1;
 
   @override

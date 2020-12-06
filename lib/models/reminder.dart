@@ -1,5 +1,7 @@
 import 'package:ReminderApp/cycle.dart';
 import 'package:intl/intl.dart';
+import 'package:timezone/standalone.dart' as tz;
+import 'package:ReminderApp/globals.dart';
 
 class Reminder {
   int id;
@@ -30,5 +32,9 @@ class Reminder {
     DateTime dt = DateFormat("EEEE dd.MM.yyyy HH:mm").parse(whole);
 
     return dt;
+  }
+
+  tz.TZDateTime getTZFirstDateTime() {
+    return tz.TZDateTime.from(getFirstDateTime(), timeLocation);
   }
 }

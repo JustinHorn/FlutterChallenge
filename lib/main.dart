@@ -1,7 +1,7 @@
-import 'package:ReminderApp/reminder_bloc.dart';
+import 'package:ReminderApp/state/reminder_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'database_helper.dart';
+import 'state/database_helper.dart';
 import 'models/reminder.dart';
 import 'screens/reminder/reminder.dart';
 import 'screens/home/home.dart';
@@ -10,7 +10,7 @@ import 'package:intl/date_symbol_data_file.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import 'package:timezone/data/latest.dart' as tz;
-import 'NotificationPlugin.dart';
+import 'Notificaitions/NotificationPlugin.dart';
 
 void main() {
   Bloc.observer = BlocObserver();

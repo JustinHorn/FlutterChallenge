@@ -1,5 +1,5 @@
 import 'package:ReminderApp/models/reminder.dart';
-import 'package:ReminderApp/reminder_bloc.dart';
+import 'package:ReminderApp/state/reminder_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:ReminderApp/cycle.dart';
@@ -11,7 +11,7 @@ import 'cycle_selector.dart';
 import 'title_field.dart';
 import 'time_selector.dart';
 
-import 'package:ReminderApp/NotificationPlugin.dart';
+import 'package:ReminderApp/Notificaitions/NotificationPlugin.dart';
 
 class ReminderPage extends StatefulWidget {
   ReminderPage({
@@ -98,7 +98,7 @@ class _ReminderPageState extends State<ReminderPage> {
                 DateTimePicker(
                   type: DateTimePickerType.date,
                   dateMask: dateMask,
-                  initialValue: time.toString(),
+                  initialValue: DateFormat("EEEE dd.MM.yyyy").format(time),
                   firstDate: DateTime(2000),
                   lastDate: DateTime(2100),
                   icon: Icon(Icons.event),
@@ -165,7 +165,7 @@ class _ReminderPageState extends State<ReminderPage> {
     );
     _reminderBloc.add(rA);
 
-    print("Reminder inserted or replaced!");
+    print("Reminder ${(reminderExists ? 'inserted' : 'replaced')}!");
   }
 
   void setMessage(newMessage) {
