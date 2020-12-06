@@ -1,15 +1,14 @@
 import 'package:ReminderApp/models/reminder.dart';
 import 'package:ReminderApp/state/reminder_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:date_time_picker/date_time_picker.dart';
 import 'package:ReminderApp/cycle.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 
 import 'action_buttons.dart';
 import 'cycle_selector.dart';
 import 'title_field.dart';
-import 'time_selector.dart';
 
 import 'package:ReminderApp/Notificaitions/NotificationPlugin.dart';
 
@@ -69,15 +68,20 @@ class _ReminderPageState extends State<ReminderPage> {
     }
 
     dayTime = DateFormat("HH:mm").format(time);
+
     firstDate = DateFormat(dateMask).format(time);
   }
 
-  void setDayTime(value) {
-    dayTime = value;
+  void setDayTime(DateTime date) {
+    setState(() {
+      dayTime = DateFormat("HH:mm").format(date);
+    });
   }
 
-  void setFirstDate(value) {
-    firstDate = value;
+  void setFirstDate(DateTime date) {
+    setState(() {
+      firstDate = DateFormat("EEEE dd.MM.yyyy").format(date);
+    });
   }
 
   @override
@@ -95,27 +99,40 @@ class _ReminderPageState extends State<ReminderPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 TitleField(_message, setMessage),
-                DateTimePicker(
-                  type: DateTimePickerType.date,
-                  dateMask: dateMask,
-                  initialValue: DateFormat("EEEE dd.MM.yyyy").format(time),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                  icon: Icon(Icons.event),
-                  dateLabelText: 'First Day',
-                  timeLabelText: "Hour",
-                  onChanged: setFirstDate,
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  width: double.infinity,
+                  child: TextField(
+                    onTap: () {
+                      DatePicker.showTimePicker(
+                        context,
+                        showTitleActions: true,
+                        onChanged: setDayTime,
+                      );
+                    },
+                    readOnly: true,
+                    controller: TextEditingController(text: dayTime),
+                    decoration: InputDecoration(labelText: "Time"),
+                  ),
                 ),
-                DateTimePicker(
-                  type: DateTimePickerType.time,
-                  dateMask: dateMask,
-                  initialValue: dayTime,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                  icon: Icon(Icons.access_alarm),
-                  dateLabelText: 'Date',
-                  timeLabelText: "Time of Day",
-                  onChanged: setDayTime,
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  width: double.infinity,
+                  child: TextField(
+                    onTap: () {
+                      print("Tab");
+                      DatePicker.showDatePicker(
+                        context,
+                        showTitleActions: true,
+                        minTime: DateTime(2000),
+                        maxTime: DateTime(2100),
+                        onChanged: setFirstDate,
+                      );
+                    },
+                    readOnly: true,
+                    controller: TextEditingController(text: firstDate),
+                    decoration: InputDecoration(labelText: "First Date"),
+                  ),
                 ),
                 CycleSelector(_cycle, setCycle)
               ],

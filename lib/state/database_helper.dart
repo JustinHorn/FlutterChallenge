@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ReminderApp/models/reminder_notification.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -15,6 +16,9 @@ class DatabaseHelper {
         db.execute(
           "CREATE TABLE reminder(id INTEGER PRIMARY KEY, message TEXT, cycle INTEGER, firstDate VARCHAR(25), dayTime VARCHAR(10))",
         );
+        db.execute(
+          "CREATE TABLE notification(id INTEGER PRIMARY KEY, reminderID INTEGER, time VARCHAR(50))",
+        );
 
         return db;
       },
@@ -26,6 +30,17 @@ class DatabaseHelper {
     Database _db = await database();
     await _db.insert('reminder', reminder.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> insertNotification(ReminderNotification rN) async {
+    Database _db = await database();
+    await _db.insert('notification', rN.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.fail);
+  }
+
+  Future<void> deleteNotification(int notificatioID) async {
+    Database _db = await database();
+    await _db.delete("notification", where: "id = ${notificatioID}");
   }
 
   Future<void> deleteReminder(int reminderId) async {

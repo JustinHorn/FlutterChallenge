@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart' as tz;
 import 'package:ReminderApp/globals.dart';
 
+import 'reminder_notification.dart';
+
 class Reminder {
   int id;
 
@@ -11,7 +13,24 @@ class Reminder {
   String firstDate;
   String dayTime;
 
-  Reminder(this.id, this.message, this.cycle, this.firstDate, this.dayTime);
+  List<ReminderNotification> notifications = List<ReminderNotification>();
+
+  Reminder(this.id, this.message, this.cycle, this.firstDate, this.dayTime) {
+    print(firstDate);
+  }
+
+  void resetList() {
+    notifications = List<ReminderNotification>();
+  }
+
+  Duration getDayTimeDuration() {
+    String hours = dayTime.split(":")[0];
+    String minutes = dayTime.split(":")[1];
+    return Duration(
+      hours: int.parse(hours),
+      minutes: int.parse(minutes),
+    );
+  }
 
   String calcNextDate() {
     return firstDate;
@@ -29,6 +48,7 @@ class Reminder {
 
   DateTime getFirstDateTime() {
     String whole = firstDate + " " + dayTime;
+
     DateTime dt = DateFormat("EEEE dd.MM.yyyy HH:mm").parse(whole);
 
     return dt;
