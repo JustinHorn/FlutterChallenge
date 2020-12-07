@@ -42,6 +42,7 @@ class ReminderNotification {
         null,
         time,
       );
+      print("scheduled notification: " + id.toString());
     }
   }
 }

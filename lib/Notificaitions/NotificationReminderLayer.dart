@@ -33,6 +33,10 @@ Future<void> scheduleReminderNotification(Reminder reminder) async {
 }
 
 void addNotifications(Reminder reminder, TZDateTime nextTime, int iterations) {
+  if (nextTime == null) {
+    throw new Exception("nextTime is not allowed to be null");
+  }
+
   for (int i = 0; i < iterations; i++) {
     ReminderNotification rN = ReminderNotification(uniqueNotificationID++,
         reminder, nextTime.add(reminder.cycle.getTimeDistance(i)));
@@ -55,6 +59,7 @@ Future<void> cancelReminderNotification(Reminder reminder) async {
     throw new Exception("reminder is not allowed to be null!");
   }
   reminder.notifications.forEach((ReminderNotification element) {
+    print("cancled notification: " + element.id.toString());
     notificationPluginLOL.cancelNotification(element.id);
     dbHelper.deleteNotification(element.id);
   });

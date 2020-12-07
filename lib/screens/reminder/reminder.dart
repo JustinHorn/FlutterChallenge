@@ -197,7 +197,7 @@ class _ReminderPageState extends State<ReminderPage> {
     );
     _reminderBloc.add(rA);
 
-    print("Reminder ${(reminderExists ? 'inserted' : 'replaced')}!");
+    print("Reminder ${(reminderExists ? 'replaced' : 'inserted')}!");
   }
 
   void setMessage(newMessage) {

@@ -16,13 +16,23 @@ class Reminder {
 
   List<ReminderNotification> notifications = List<ReminderNotification>();
 
-  Reminder(this.id, this.message, this.cycle, this.firstDate, this.dayTime,
-      {this.active = true}) {
+  Reminder(
+    this.id,
+    this.message,
+    this.cycle,
+    this.firstDate,
+    this.dayTime, {
+    this.active = true,
+  }) {
     print(firstDate);
   }
 
   void resetList() {
+    print("reminder ${id} list lenght: " + notifications.length.toString());
+
     notifications = List<ReminderNotification>();
+
+    print("reminder ${id} resetted list");
   }
 
   Duration getDayTimeDuration() {

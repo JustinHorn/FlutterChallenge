@@ -44,20 +44,22 @@ class ReminderBloc extends Bloc<ReminderAction, List<Reminder>> {
 
       case ReminderActionType.add:
         newList.add(event.reminder);
-        await databaseHelper.insertReminder(event.reminder);
+        databaseHelper.insertReminder(event.reminder);
         scheduleReminderNotification(event.reminder);
         yield newList;
         break;
       case ReminderActionType.replace:
+        print("replacing reminder!");
+
         replaceReminderInList(newList, event.reminder);
-        await databaseHelper.insertReminder(event.reminder);
-        replaceReminderNotification(event.reminder);
+        databaseHelper.insertReminder(event.reminder);
+
         yield newList;
         break;
       case ReminderActionType.delete:
         removeReminderFromList(newList, event.reminder);
-        await databaseHelper.deleteReminder(event.reminder.id);
-        cancelReminderNotification(event.reminder);
+        databaseHelper.deleteReminder(event.reminder.id);
+
         yield newList;
         break;
       default:
@@ -67,11 +69,15 @@ class ReminderBloc extends Bloc<ReminderAction, List<Reminder>> {
 
   void replaceReminderInList(List<Reminder> list, Reminder reminder) {
     int index = getReminderIndexInList(list, reminder);
+    cancelReminderNotification(list[index]);
     list[index] = reminder;
+    scheduleReminderNotification(reminder);
   }
 
   void removeReminderFromList(List<Reminder> list, Reminder reminder) {
     int index = getReminderIndexInList(list, reminder);
+    cancelReminderNotification(reminder);
+
     list.removeAt(index);
   }
 
