@@ -33,7 +33,10 @@ class Reminder {
   }
 
   String calcNextDate() {
-    return firstDate;
+    if (notifications.length == 0) {
+      return "";
+    }
+    return DateFormat("EEEE dd.MM.yyyy").format(notifications.first.time);
   }
 
   Map<String, dynamic> toMap() {

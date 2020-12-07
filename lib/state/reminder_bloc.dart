@@ -33,7 +33,12 @@ class ReminderBloc extends Bloc<ReminderAction, List<Reminder>> {
     List<Reminder> newList = List.from(state);
     switch (event.type) {
       case ReminderActionType.init:
-        yield await databaseHelper.getReminders();
+        List<Reminder> r = await databaseHelper.getReminders();
+
+        r.forEach((element) {
+          replaceReminderNotification(element);
+        });
+        yield r;
         break;
       case ReminderActionType.addAll:
         newList.addAll(event.reminders);

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ReminderApp/globals.dart';
 import 'package:ReminderApp/models/reminder_notification.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -7,6 +8,8 @@ import 'package:path/path.dart';
 import '../cycle.dart';
 import '../models/reminder.dart';
 import 'package:intl/intl.dart';
+
+import 'package:ReminderApp/date_extensions.dart';
 
 class DatabaseHelper {
   Future<Database> database() async {
@@ -51,17 +54,31 @@ class DatabaseHelper {
   Future<List<Reminder>> getReminders() async {
     Database _db = await database();
     List<Map<String, dynamic>> reminderMap = await _db.query("reminder");
+    List<Map<String, dynamic>> notificationMap =
+        await _db.query("notification");
+
+    if (notificationMap.length > 0 &&
+        notificationMap.last["id"] > uniqueNotificationID) {
+      uniqueNotificationID = notificationMap.last["id"] + 1;
+    }
+
     return List.generate(
       reminderMap.length,
       (index) {
         print(reminderMap[index]);
-        return Reminder(
+        Reminder reminder = Reminder(
           reminderMap[index]["id"],
           reminderMap[index]["message"],
           CycleExtension.getById(reminderMap[index]["cycle"]),
           reminderMap[index]["firstDate"],
           reminderMap[index]["dayTime"],
         );
+
+        List<ReminderNotification> nR = notificationMap
+            .where((nR) => nR["reminderID"] == reminder.id)
+            .map((nR) => ReminderNotification(nR["id"], reminder,
+                DateFormat(notificationTimeMask).parse(nR["time"]).toTZ()))
+            .toList();
       },
     );
   }

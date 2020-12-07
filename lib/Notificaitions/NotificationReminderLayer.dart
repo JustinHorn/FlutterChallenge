@@ -6,31 +6,12 @@ import 'package:timezone/standalone.dart';
 
 import 'package:ReminderApp/globals.dart';
 
-import '../cycle.dart';
+import 'package:ReminderApp/cycle.dart';
 import 'NotificationPlugin.dart';
 
+import 'package:ReminderApp/date_extensions.dart';
+
 DatabaseHelper dbHelper = DatabaseHelper();
-
-int uniqueID = 1;
-
-extension on DateTime {
-  bool isInTheFuture() {
-    return this.isAfter(DateTime.now());
-  }
-
-  TZDateTime toTZ() {
-    return TZDateTime.from(this, timeLocation);
-  }
-}
-
-extension on TZDateTime {
-  bool isInPast() {
-    return this.microsecondsSinceEpoch -
-            TZDateTime.from(DateTime.now(), timeLocation)
-                .microsecondsSinceEpoch <
-        0;
-  }
-}
 
 DateTime getDayFloorDayTime() {
   return DateFormat("dd.MM.yyyy")
@@ -39,64 +20,40 @@ DateTime getDayFloorDayTime() {
 
 Future<void> scheduleReminderNotification(Reminder reminder) async {
   TZDateTime firstDateTime = reminder.getFirstDateTime().toTZ();
-  TZDateTime nextTime = firstDateTime;
 
-  switch (reminder.cycle) {
-    case Cycle.once:
-      schedule(ReminderNotification(uniqueID++, reminder, nextTime));
-      break;
-    case Cycle.daily:
-      if (!firstDateTime.isInTheFuture()) {
-        nextTime = getDayFloorDayTime().add(reminder.getDayTimeDuration());
-      }
+  if (reminder.cycle == Cycle.once) {
+    addNotifications(reminder, firstDateTime, 1);
+  } else {
+    TZDateTime nextTime = getNextFutureScheduledTime(reminder);
 
-      List<ReminderNotification> newNotificationList =
-          List<ReminderNotification>();
-
-      for (int i = 0; i < NSiA; i++) {
-        ReminderNotification rN =
-            ReminderNotification(uniqueID++, reminder, nextTime);
-        newNotificationList.add(rN);
-        nextTime = nextTime.add(Duration(days: 1));
-        dbHelper.insertNotification(rN);
-        schedule(rN);
-      }
-
-      break;
-    default:
+    addNotifications(reminder, nextTime, NSiA);
   }
 }
 
-Future<void> schedule(ReminderNotification rN) async {
-  Reminder reminder = rN.reminder;
-  TZDateTime scheduleTime = reminder.getTZFirstDateTime();
-
-  if (scheduleTime.isInPast()) {
-    print("Notification was not schedulded do to Time being in the past!");
-  } else {
-    await notificationPluginLOL.scheduleNotification(
-      rN.id,
-      reminder.message,
-      null,
-      scheduleTime,
-    );
+void addNotifications(reminder, nextTime, iterations) {
+  for (int i = 0; i < iterations; i++) {
+    ReminderNotification rN = ReminderNotification(uniqueNotificationID++,
+        reminder, nextTime.add(reminder.cycle.getTimeDistance(i)));
+    dbHelper.insertNotification(rN);
   }
+}
+
+/// could get perfomance issues if the interval is small and the start day a long time away
+/// but it would take some years for that to take affect - if it even ever does.
+TZDateTime getNextFutureScheduledTime(reminder) {
+  TZDateTime nextTime = reminder.getFirstDateTime().toTZ();
+  while (!nextTime.isInTheFuture()) {
+    nextTime = nextTime.add(reminder.cycle.getTimeDistance(1));
+  }
+  return nextTime;
 }
 
 Future<void> cancelReminderNotification(Reminder reminder) async {
-  switch (reminder.cycle) {
-    case Cycle.once:
-
-    case Cycle.daily:
-      reminder.notifications.forEach((ReminderNotification element) {
-        notificationPluginLOL.cancelNotification(element.id);
-        dbHelper.deleteNotification(element.id);
-      });
-      reminder.resetList();
-
-      break;
-    default:
-  }
+  reminder.notifications.forEach((ReminderNotification element) {
+    notificationPluginLOL.cancelNotification(element.id);
+    dbHelper.deleteNotification(element.id);
+  });
+  reminder.resetList();
 }
 
 Future<void> replaceReminderNotification(Reminder reminder) async {
