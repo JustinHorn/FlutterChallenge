@@ -9,23 +9,35 @@ class CycleSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ButtonBar(
-      alignment: MainAxisAlignment.center,
-      children: Cycle.values
-          .map(
-            (cycle) => RaisedButton(
-              padding: const EdgeInsets.all(0.0),
-              onPressed: () => setCycle(cycle),
-              color: cycle == _cycle ? Colors.blue : null,
-              child: Container(
-                decoration: BoxDecoration(),
-                child: Text(cycle.name),
+    return Container(
+        child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Cycle:"),
+        Row(
+          children: [
+            Expanded(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 5,
+                children: Cycle.values
+                    .map(
+                      (cycle) => RaisedButton(
+                        padding: const EdgeInsets.all(0.0),
+                        onPressed: () => setCycle(cycle),
+                        color: cycle == _cycle ? Colors.blue : null,
+                        child: Container(
+                          decoration: BoxDecoration(),
+                          child: Text(cycle.name),
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
-            ),
-          )
-          .toList(),
-    );
+            )
+          ],
+        )
+      ],
+    ));
   }
 }
-
-setCycle(Cycle cycle) {}

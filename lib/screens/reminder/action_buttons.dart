@@ -49,11 +49,66 @@ class DeleteButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingActionButton(
       onPressed: () async {
-        await deleteReminder();
-        Navigator.pop(context);
+        showAlertDialog(context);
       },
       child: Icon(Icons.delete),
       heroTag: "deleteBtn",
+      backgroundColor: Colors.red,
+    );
+  }
+
+  showAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Theme.of(context).primaryColor,
+        ),
+        child: Text(
+          "Cancel",
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+      ),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget deleteButton = FlatButton(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.red,
+        ),
+        child: Text(
+          "Delete",
+          style: TextStyle(color: Colors.white, backgroundColor: Colors.red),
+        ),
+      ),
+      onPressed: () async {
+        await deleteReminder();
+        Navigator.pop(context);
+        Navigator.pop(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Do you really want to delete this reminder?"),
+      content: null,
+      actions: [cancelButton, deleteButton],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

@@ -23,7 +23,9 @@ class ReminderHomeEntry extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Theme.of(context).primaryColor,
+          color: Theme.of(context)
+              .primaryColor
+              .withOpacity(reminder.active ? 1 : 0.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -10,6 +10,8 @@ import 'action_buttons.dart';
 import 'cycle_selector.dart';
 import 'title_field.dart';
 
+import 'time_selector.dart';
+
 import 'package:ReminderApp/Notificaitions/NotificationPlugin.dart';
 
 class ReminderPage extends StatefulWidget {
@@ -100,40 +102,7 @@ class _ReminderPageState extends State<ReminderPage> {
             child: ListView(
               children: <Widget>[
                 TitleField(_message, setMessage),
-                Container(
-                  padding: EdgeInsets.all(20.0),
-                  width: double.infinity,
-                  child: TextField(
-                    onTap: () {
-                      DatePicker.showTimePicker(
-                        context,
-                        showTitleActions: true,
-                        onChanged: setDayTime,
-                      );
-                    },
-                    readOnly: true,
-                    controller: TextEditingController(text: dayTime),
-                    decoration: InputDecoration(labelText: "Time"),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(20.0),
-                  width: double.infinity,
-                  child: TextField(
-                    onTap: () {
-                      DatePicker.showDatePicker(
-                        context,
-                        showTitleActions: true,
-                        minTime: DateTime(2000),
-                        maxTime: DateTime(2100),
-                        onChanged: setFirstDate,
-                      );
-                    },
-                    readOnly: true,
-                    controller: TextEditingController(text: firstDate),
-                    decoration: InputDecoration(labelText: "First Date"),
-                  ),
-                ),
+                TimeSelector(dayTime, firstDate, setDayTime, setFirstDate),
                 CycleSelector(_cycle, setCycle),
                 Row(children: [
                   Text("Active:"),
