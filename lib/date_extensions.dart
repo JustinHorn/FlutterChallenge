@@ -1,5 +1,4 @@
 import 'package:ReminderApp/globals.dart';
-import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart';
 
 extension MyDateTime on DateTime {

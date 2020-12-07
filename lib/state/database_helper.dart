@@ -17,7 +17,7 @@ class DatabaseHelper {
       join(await getDatabasesPath(), "reminder.db"),
       onCreate: (db, version) {
         db.execute(
-          "CREATE TABLE reminder(id INTEGER PRIMARY KEY, message TEXT, cycle INTEGER, firstDate VARCHAR(25), dayTime VARCHAR(10))",
+          "CREATE TABLE reminder(id INTEGER PRIMARY KEY, message TEXT, cycle INTEGER, firstDate VARCHAR(25), dayTime VARCHAR(10),active INTEGER)",
         );
         db.execute(
           "CREATE TABLE notification(id INTEGER PRIMARY KEY, reminderID INTEGER, time VARCHAR(50))",
@@ -65,13 +65,13 @@ class DatabaseHelper {
     return List.generate(
       reminderMap.length,
       (index) {
-        print(reminderMap[index]);
         Reminder reminder = Reminder(
           reminderMap[index]["id"],
           reminderMap[index]["message"],
           CycleExtension.getById(reminderMap[index]["cycle"]),
           reminderMap[index]["firstDate"],
           reminderMap[index]["dayTime"],
+          active: reminderMap[index]["active"] == 1,
         );
 
         List<ReminderNotification> nR = notificationMap
@@ -79,6 +79,7 @@ class DatabaseHelper {
             .map((nR) => ReminderNotification(nR["id"], reminder,
                 DateFormat(notificationTimeMask).parse(nR["time"]).toTZ()))
             .toList();
+        return reminder;
       },
     );
   }

@@ -40,6 +40,8 @@ class _ReminderPageState extends State<ReminderPage> {
 
   String dateMask = 'EEEE dd.MM.yyyy';
 
+  bool active = true;
+
   ReminderBloc _reminderBloc;
 
   @override
@@ -65,6 +67,7 @@ class _ReminderPageState extends State<ReminderPage> {
       time = widget.reminder.getFirstDateTime();
 
       _cycle = widget.reminder.cycle;
+      active = widget.reminder.active;
     }
 
     dayTime = DateFormat("HH:mm").format(time);
@@ -94,9 +97,7 @@ class _ReminderPageState extends State<ReminderPage> {
         padding: const EdgeInsets.all(20.0),
         child: Center(
           child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: ListView(
               children: <Widget>[
                 TitleField(_message, setMessage),
                 Container(
@@ -120,7 +121,6 @@ class _ReminderPageState extends State<ReminderPage> {
                   width: double.infinity,
                   child: TextField(
                     onTap: () {
-                      print("Tab");
                       DatePicker.showDatePicker(
                         context,
                         showTitleActions: true,
@@ -134,7 +134,21 @@ class _ReminderPageState extends State<ReminderPage> {
                     decoration: InputDecoration(labelText: "First Date"),
                   ),
                 ),
-                CycleSelector(_cycle, setCycle)
+                CycleSelector(_cycle, setCycle),
+                Row(children: [
+                  Text("Active:"),
+                  Switch(
+                    value: active,
+                    onChanged: (value) => setState(() {
+                      active = value;
+                    }),
+                    activeTrackColor: Colors.lightGreenAccent,
+                    activeColor: Colors.green,
+                  ),
+                  Expanded(
+                    child: Text(""),
+                  )
+                ])
               ],
             ),
           ),
@@ -174,6 +188,7 @@ class _ReminderPageState extends State<ReminderPage> {
       _cycle,
       firstDate,
       dayTime,
+      active: active,
     );
 
     ReminderAction rA = new ReminderAction(

@@ -13,6 +13,9 @@ class ReminderNotification {
   TZDateTime time;
 
   ReminderNotification(this.id, this.reminder, this.time) {
+    if (reminder == null) {
+      throw Exception("Reminder is not allowed to be null!");
+    }
     reminder.notifications.add(this);
     schedule();
   }

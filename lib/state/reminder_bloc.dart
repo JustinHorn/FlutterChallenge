@@ -5,7 +5,7 @@ import 'database_helper.dart';
 import '../models/reminder.dart';
 import 'package:timezone/standalone.dart' as tz;
 
-enum ReminderActionType { init, add, replace, delete, addAll }
+enum ReminderActionType { init, add, replace, delete }
 
 class ReminderAction {
   ReminderActionType _type;
@@ -31,6 +31,7 @@ class ReminderBloc extends Bloc<ReminderAction, List<Reminder>> {
   @override
   Stream<List<Reminder>> mapEventToState(ReminderAction event) async* {
     List<Reminder> newList = List.from(state);
+
     switch (event.type) {
       case ReminderActionType.init:
         List<Reminder> r = await databaseHelper.getReminders();
@@ -40,13 +41,7 @@ class ReminderBloc extends Bloc<ReminderAction, List<Reminder>> {
         });
         yield r;
         break;
-      case ReminderActionType.addAll:
-        newList.addAll(event.reminders);
-        event.reminders.forEach((element) async {
-          await databaseHelper.insertReminder(element);
-        });
-        yield newList;
-        break;
+
       case ReminderActionType.add:
         newList.add(event.reminder);
         await databaseHelper.insertReminder(event.reminder);

@@ -19,18 +19,20 @@ DateTime getDayFloorDayTime() {
 }
 
 Future<void> scheduleReminderNotification(Reminder reminder) async {
-  TZDateTime firstDateTime = reminder.getFirstDateTime().toTZ();
+  if (reminder.active) {
+    TZDateTime firstDateTime = reminder.getFirstDateTime().toTZ();
 
-  if (reminder.cycle == Cycle.once) {
-    addNotifications(reminder, firstDateTime, 1);
-  } else {
-    TZDateTime nextTime = getNextFutureScheduledTime(reminder);
+    if (reminder.cycle == Cycle.once) {
+      addNotifications(reminder, firstDateTime, 1);
+    } else {
+      TZDateTime nextTime = getNextFutureScheduledTime(reminder);
 
-    addNotifications(reminder, nextTime, NSiA);
+      addNotifications(reminder, nextTime, NSiA);
+    }
   }
 }
 
-void addNotifications(reminder, nextTime, iterations) {
+void addNotifications(Reminder reminder, TZDateTime nextTime, int iterations) {
   for (int i = 0; i < iterations; i++) {
     ReminderNotification rN = ReminderNotification(uniqueNotificationID++,
         reminder, nextTime.add(reminder.cycle.getTimeDistance(i)));
@@ -40,7 +42,7 @@ void addNotifications(reminder, nextTime, iterations) {
 
 /// could get perfomance issues if the interval is small and the start day a long time away
 /// but it would take some years for that to take affect - if it even ever does.
-TZDateTime getNextFutureScheduledTime(reminder) {
+TZDateTime getNextFutureScheduledTime(Reminder reminder) {
   TZDateTime nextTime = reminder.getFirstDateTime().toTZ();
   while (!nextTime.isInTheFuture()) {
     nextTime = nextTime.add(reminder.cycle.getTimeDistance(1));
@@ -49,6 +51,9 @@ TZDateTime getNextFutureScheduledTime(reminder) {
 }
 
 Future<void> cancelReminderNotification(Reminder reminder) async {
+  if (reminder == null) {
+    throw new Exception("reminder is not allowed to be null!");
+  }
   reminder.notifications.forEach((ReminderNotification element) {
     notificationPluginLOL.cancelNotification(element.id);
     dbHelper.deleteNotification(element.id);

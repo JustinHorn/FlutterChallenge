@@ -12,10 +12,12 @@ class Reminder {
   Cycle cycle;
   String firstDate;
   String dayTime;
+  bool active;
 
   List<ReminderNotification> notifications = List<ReminderNotification>();
 
-  Reminder(this.id, this.message, this.cycle, this.firstDate, this.dayTime) {
+  Reminder(this.id, this.message, this.cycle, this.firstDate, this.dayTime,
+      {this.active = true}) {
     print(firstDate);
   }
 
@@ -46,6 +48,7 @@ class Reminder {
       "cycle": cycle.id,
       "firstDate": firstDate,
       "dayTime": dayTime,
+      "active": active ? 1 : 0,
     };
   }
 
