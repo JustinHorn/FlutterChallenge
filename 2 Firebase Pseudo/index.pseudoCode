@@ -1,0 +1,54 @@
+
+
+// cloud function
+exports.saveUrlToStorage = functions.storage.object().onFinalize(async (object) => {
+    const url = await createUrlFromImageFile(object);
+
+    if(!shopWithNameOfImageExists(object)) { // does Shop exist in store
+            await createShopWithNameOfImage(object); // create Shop in store
+    }   
+    await addImgUrlToFireBaseStoreShopEntry(url, object); // associate image with shop
+});
+
+
+
+// in Epap dart app
+
+Future<void> scanImage() async {
+
+    ...
+    if(shopIsIdentified) {
+        ShopData shopData = await downloadShopDataFromFirebaseStore();
+        stateManager.addEpap(shopData,scanData);    
+    } else {
+    ...
+}
+
+...
+// in List of Epaps in Epap App
+
+child: StreamBuilder(
+    stream: stateManager.read<Epaps>()
+    
+    builder: (context,snapshot) {
+
+        return ListView.generate(
+            
+
+            ...
+            return Epap(snapshot.data[index]) //
+            ...
+
+        )
+    }
+)
+
+// Single Epap widget
+...
+class Epap extends .... {
+...
+Widget build(BuildContext) {
+    ...
+    child: data.imgUrl != null? Network.Image( data.imgUrl ): PlaceHolderImage(),
+...
+}

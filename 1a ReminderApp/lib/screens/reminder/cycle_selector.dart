@@ -28,7 +28,13 @@ class CycleSelector extends StatelessWidget {
                         color: cycle == _cycle ? Colors.blue : null,
                         child: Container(
                           decoration: BoxDecoration(),
-                          child: Text(cycle.name),
+                          child: Text(
+                            cycle.name,
+                            style: TextStyle(
+                                color: cycle == _cycle
+                                    ? Colors.white
+                                    : Colors.black),
+                          ),
                         ),
                       ),
                     )

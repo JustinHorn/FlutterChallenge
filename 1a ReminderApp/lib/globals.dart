@@ -4,6 +4,6 @@ tz.Location timeLocation = tz.getLocation("Europe/Berlin");
 
 String notificationTimeMask = "dd.MM.yyyy HH:mm";
 
-int NSiA = 5; // Notification Scheduled in Advance
+int NSiA = 10; // Notification Scheduled in Advance
 
 int uniqueNotificationID = 1;

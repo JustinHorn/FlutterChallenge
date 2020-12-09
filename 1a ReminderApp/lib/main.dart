@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         title: 'Remindely',
         theme: ThemeData(
           primaryColor: Colors.blue,
-          primarySwatch: Colors.amber,
+          primarySwatch: Colors.green,
           primaryTextTheme: TextTheme(
             bodyText1: TextStyle(color: Colors.white),
           ),
